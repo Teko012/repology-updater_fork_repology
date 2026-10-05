@@ -276,6 +276,9 @@ schemas = {
                         # aur
                         'max_api_url_length': int,
 
+                        # openvsx
+                        'sitemap_url': str,
+
                         # rsync
                         'rsync_include': str,
                         'rsync_exclude': str,
