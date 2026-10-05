@@ -25,7 +25,13 @@
     - type: PACKAGE_HOMEPAGE
       url: 'https://t2linux.com/packages/{srcname}'
     - type: PACKAGE_SOURCES
-      url: 'https://svn.exactcode.de/t2/trunk/{path}/'
+      url: 'https://github.com/rxrbln/t2sde/tree/main/{path}'
+    - type: PACKAGE_RECIPE
+      url: 'https://github.com/rxrbln/t2sde/blob/main/{path}/{srcname}.desc'
+    - type: PACKAGE_RECIPE_RAW
+      url: 'https://raw.githubusercontent.com/rxrbln/t2sde/main/{path}/{srcname}.desc'
+    - type: PACKAGE_PATCH
+      url: 'https://github.com/rxrbln/t2sde/blob/main/{path}/{?patch}'
     - type: PACKAGE_PATCH_RAW
-      url: 'https://svn.exactcode.de/t2/trunk/{path}/{?patch}'
+      url: 'https://raw.githubusercontent.com/rxrbln/t2sde/main/{path}/{?patch}'
   groups: [ all, production ]
