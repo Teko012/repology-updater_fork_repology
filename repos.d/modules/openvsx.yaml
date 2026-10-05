@@ -1,21 +1,23 @@
 ###########################################################################
 # OpenVSX
 ###########################################################################
-# NOTE: API returns more data for individual packages, including upstream
-# url. Unfortunately, we cannot fetch individual API output for every package
-# The search API caps ?size at 1000, so OpenVSXFetcher pages through it by
-# offset.
+# NOTE: search API is backed by elasticsearch and cannot return more than
+# 10000 entries, so query API is used instead. It caps ?size at 1000, so
+# OpenVSXFetcher pages through it by offset and validates the result
+# against the sitemap.
 - name: openvsx
   type: modules
   desc: Open VSX
   family: openvsx
   ruleset: openvsx
-  minpackages: 3500
+  minpackages: 15000
+  update_period: 1h
   sources:
-    - name: search
+    - name: query
       fetcher:
         class: OpenVSXFetcher
-        url: https://open-vsx.org/api/-/search
+        url: https://open-vsx.org/api/v2/-/query
+        sitemap_url: https://open-vsx.org/sitemap.xml
       parser:
         class: OpenVSXParser
   shadow: true
