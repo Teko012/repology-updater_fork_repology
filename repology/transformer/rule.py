@@ -47,7 +47,7 @@ class Rule:
         self.number = number
 
         self.pretty = str(ruledata)
-        self.texthash = xxhash.xxh64_intdigest(self.pretty)
+        self.texthash = xxhash.xxh64_intdigest(self.pretty.encode('utf8'))
 
         self._matchers = []
         self._actions = []

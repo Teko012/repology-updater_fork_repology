@@ -1,31 +1,27 @@
-###########################################################################
-# AerynOS
-###########################################################################
-- name: serpentos
-  sortname: aerynos
+- name: aerynos
   type: repository
-  desc: AerynOS
-  family: serpentos
-  ruleset: serpentos
-  minpackages: 400
+  desc: aerynOS
+  family: aerynos
+  ruleset: aerynos
+  minpackages: 1600
   sources:
     - name: recipes
       fetcher:
         class: GitFetcher
-        url: 'https://github.com/AerynOS/recipes.git'
+        url: 'https://github.com/aerynOS/recipes.git'
         branch: main
       parser:
-        class: SerpentOsGitParser
+        class: AerynOsGitParser
   repolinks:
     - desc: AerynOS home
       url: https://aerynos.com/
     - desc: Recipes repository
-      url: https://github.com/AerynOS/recipes
+      url: https://github.com/aerynOS/recipes
   packagelinks:
     - type: PACKAGE_SOURCES
-      url: 'https://github.com/AerynOS/recipes/tree/main/{srcname|first_letter}/{srcname}'
+      url: 'https://github.com/aerynOS/recipes/tree/main/{srcname|first_letter}/{srcname}'
     - type: PACKAGE_RECIPE
-      url: 'https://github.com/AerynOS/recipes/blob/main/{srcname|first_letter}/{srcname}/stone.yaml'
+      url: 'https://github.com/aerynOS/recipes/blob/main/{srcname|first_letter}/{srcname}/stone.yaml'
     - type: PACKAGE_RECIPE_RAW
-      url: 'https://raw.githubusercontent.com/AerynOS/recipes/main/{srcname|first_letter}/{srcname}/stone.yaml'
-  groups: [ all ] # fails sanity check
+      url: 'https://raw.githubusercontent.com/aerynOS/recipes/main/{srcname|first_letter}/{srcname}/stone.yaml'
+  groups: [ all, production ]

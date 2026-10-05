@@ -1,0 +1,28 @@
+- name: serenityos
+  type: repository
+  desc: SerenityOS
+  family: serenityos
+  ruleset: serenityos
+  minpackages: 300
+  sources:
+    - name: feed.json
+      fetcher:
+        class: FileFetcher
+        url: https://ports.serenityos.net/feed.json?v=preset/repology
+      parser:
+        class: SerenityOsJsonParser
+  repolinks:
+    - desc: SerenityOS home
+      url: https://serenityos.org/
+    - desc: SerenityOS repository
+      url: https://github.com/SerenityOS/serenity
+  packagelinks:
+    - type: PACKAGE_HOMEPAGE
+      url: 'https://ports.serenityos.net/{srcname}'
+    - type: PACKAGE_SOURCES
+      url: 'https://github.com/SerenityOS/serenity/tree/master/Ports/{srcname}'
+    - type: PACKAGE_RECIPE
+      url: 'https://github.com/SerenityOS/serenity/blob/master/Ports/{srcname}/package.sh'
+    - type: PACKAGE_RECIPE_RAW
+      url: 'https://raw.githubusercontent.com/SerenityOS/serenity/master/Ports/{srcname}/package.sh'
+  groups: [ all, production ]

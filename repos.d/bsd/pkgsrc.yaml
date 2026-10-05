@@ -5,6 +5,7 @@
 - name: pkgsrc_{{year}}_{{quarter}}
   type: repository
   desc: pkgsrc-{{year}}Q{{quarter}}
+  statsgroup: pkgsrc
   family: pkgsrc
   ruleset: pkgsrc
   color: 'ff6600'
@@ -37,12 +38,13 @@
   groups: [ all, production, pkgsrc ]
 {% endmacro %}
 
-{{ pkgsrc(2025, 4, minpackages=19000) }}
-{{ pkgsrc(2026, 1, minpackages=19000) }}
+{{ pkgsrc(2026, 2, minpackages=19000) }}
+{{ pkgsrc(2026, 3, minpackages=19000) }}
 
 - name: pkgsrc_current
   type: repository
   desc: pkgsrc current
+  statsgroup: pkgsrc
   family: pkgsrc
   ruleset: pkgsrc
   color: 'ff6600'

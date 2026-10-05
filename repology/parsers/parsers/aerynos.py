@@ -27,7 +27,7 @@ from repology.parsers import Parser
 from repology.parsers.walk import walk_tree
 
 
-class SerpentOsGitParser(Parser):
+class AerynOsGitParser(Parser):
     def iter_parse(self, path: str, factory: PackageFactory) -> Iterable[PackageMaker]:
         for filename in walk_tree(path, suffix='stone.yaml'):
             relpath = os.path.relpath(filename, path)
