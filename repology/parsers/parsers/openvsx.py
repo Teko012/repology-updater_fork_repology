@@ -16,36 +16,89 @@
 # along with repology.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import Iterable
+import re
+from typing import Any, Iterable
 
-from repology.package import LinkType
+from libversion import version_compare
+
+from repology.package import LinkType, PackageFlags
 from repology.packagemaker import NameType, PackageFactory, PackageMaker
 from repology.parsers import Parser
 from repology.parsers.json import iter_json_list
 
 
+_LICENSE_EXPRESSION = re.compile('[A-Za-z0-9.+() -]+')
+
+
+def _is_license_expression(value: str | None) -> bool:
+    return value is not None and _LICENSE_EXPRESSION.fullmatch(value) is not None and not value.startswith('SEE ') and value != 'UNLICENSED'
+
+
+def _is_better_entry(entry: dict[str, Any], current: dict[str, Any]) -> bool:
+    res = version_compare(entry['version'], current['version'])
+    return res > 0 or (res == 0 and entry['targetPlatform'] == 'universal')
+
+
 class OpenVSXParser(Parser):
     def iter_parse(self, path: str, factory: PackageFactory) -> Iterable[PackageMaker]:
-        for pagename in os.listdir(path):
-            yield from self._iter_parse_page(os.path.join(path, pagename), factory)
+        # there's an entry for each target platform, and these may have
+        # different versions; pick the latest one, preferring universal
+        entries: dict[str, dict[str, Any]] = {}
 
-    def _iter_parse_page(self, path: str, factory: PackageFactory) -> Iterable[PackageMaker]:
-        for extension in iter_json_list(path, ('extensions', None)):
-            with factory.begin() as pkg:
-                # TODO: More metadata is available, it's just harder to fetch and will require its own fetcher, in all likelihood
-                namespace = extension['namespace']
-                name = extension['name']
+        for pagename in os.listdir(path):
+            if not pagename.endswith('.json'):
+                continue
+
+            for extension in iter_json_list(os.path.join(path, pagename), ('extensions', None)):
+                key = f'{extension["namespace"]}.{extension["name"]}'.lower()
+
+                # only keep what's needed, the full entries are huge
+                entry = {
+                    'namespace': extension['namespace'],
+                    'name': extension['name'],
+                    'displayName': extension.get('displayName'),
+                    'version': extension['version'],
+                    'preRelease': extension.get('preRelease', False),
+                    'targetPlatform': extension.get('targetPlatform', 'universal'),
+                    'description': extension.get('description'),
+                    'homepage': extension.get('homepage'),
+                    'repository': extension.get('repository'),
+                    'bugs': extension.get('bugs'),
+                    'license': extension.get('license'),
+                    'download': extension.get('files', {}).get('download'),
+                    'manifest': extension.get('files', {}).get('manifest'),
+                }
+
+                if key not in entries or _is_better_entry(entry, entries[key]):
+                    entries[key] = entry
+
+        for key, entry in sorted(entries.items()):
+            with factory.begin(key) as pkg:
+                namespace = entry['namespace']
+                name = entry['name']
                 pkg.add_name(f'{namespace}.{name}', NameType.OPENVSX_NAMESPACE_DOT_NAME)
                 pkg.add_name(f'{namespace}/{name}', NameType.OPENVSX_NAMESPACE_SLASH_NAME)
-                pkg.add_name(extension.get('displayName', name), NameType.OPENVSX_DISPLAYNAME)
-                pkg.set_version(extension['version'])
-                pkg.set_summary(extension.get('description'))
+                pkg.add_name(entry['displayName'] or name, NameType.OPENVSX_DISPLAYNAME)
+                pkg.set_version(entry['version'])
+                pkg.set_flags(PackageFlags.DEVEL, entry['preRelease'])
+                pkg.set_summary(entry['description'])
                 pkg.add_maintainers(f'{namespace}@openvsx')
 
-                if not extension['files']:
+                pkg.add_links(LinkType.UPSTREAM_HOMEPAGE, entry['homepage'])
+                pkg.add_links(LinkType.UPSTREAM_REPOSITORY, entry['repository'])
+                # package.json bugs field may be an email instead of an url
+                if entry['bugs'] and not entry['bugs'].startswith('mailto:'):
+                    pkg.add_links(LinkType.UPSTREAM_ISSUE_TRACKER, entry['bugs'])
+
+                # package.json license field, which may also be a reference to a file,
+                # an url, a localization placeholder or a proprietary license notice
+                if _is_license_expression(entry['license']):
+                    pkg.add_licenses(entry['license'])
+
+                if not entry['download']:
                     continue
 
-                pkg.add_links(LinkType.PROJECT_DOWNLOAD, extension['files']['download'])
-                pkg.add_links(LinkType.PACKAGE_RECIPE_RAW, extension['files']['download'].rsplit('/', 1)[0] + '/package.json')
+                pkg.add_links(LinkType.PROJECT_DOWNLOAD, entry['download'])
+                pkg.add_links(LinkType.PACKAGE_RECIPE_RAW, entry['manifest'])
 
                 yield pkg
