@@ -5,6 +5,7 @@
 - name: pkgsrc_{{year}}_{{quarter}}
   type: repository
   desc: pkgsrc-{{year}}Q{{quarter}}
+  statsgroup: pkgsrc
   family: pkgsrc
   ruleset: pkgsrc
   color: 'ff6600'
@@ -43,6 +44,7 @@
 - name: pkgsrc_current
   type: repository
   desc: pkgsrc current
+  statsgroup: pkgsrc
   family: pkgsrc
   ruleset: pkgsrc
   color: 'ff6600'
