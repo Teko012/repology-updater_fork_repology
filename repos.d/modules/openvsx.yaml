@@ -25,4 +25,4 @@
   packagelinks:
     - type: PROJECT_HOMEPAGE
       url: 'https://open-vsx.org/extension/{srcname}'
-  groups: [ all, production ]
+  groups: [ all ] # See https://github.com/repology/repology-updater/pull/1615
